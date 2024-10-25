@@ -23,6 +23,7 @@ token_provider = get_bearer_token_provider(
 search_service_endpoint = os.environ["SEARCH_SERVICE_ENDPOINT"]
 aoai_endpoint = os.environ["AOAI_ENDPOINT"]
 aoai_api_version = os.environ["AOAI_API_VERSION"]
+aoai_embeddings_deployment_name = os.environ["AOAI_EMBEDDINGS_DEPLOYMENT_NAME"]
 document_intelligence_endpoint = os.environ["DOCUMENT_INTELLIGENCE_ENDPOINT"]
 
 # Pythonの実行時にコマンドライン引数を受け取るための設定を行う
@@ -117,7 +118,7 @@ def index_docs(chunks: list):
         print(f"{i+1}個目のチャンクを処理中...")
         response = openAIClient.embeddings.create(
             input = chunk,
-            model = "text-embedding-ada-002-deploy"
+            model = aoai_embeddings_deployment_name
         )
 
         # チャンク化されたテキストとそのテキストのベクトルをAzure AI Searchにアップロードする
