@@ -9,6 +9,9 @@ from azure.search.documents.models import VectorizedQuery
 import argparse
 import glob
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # 開発環境・本番環境でも同じ認証方式を使用するため、DefaultAzureCredentialを用いて認証情報を取得する。
 azure_credential = DefaultAzureCredential()
