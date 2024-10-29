@@ -4,3 +4,4 @@ azure-ai-formrecognizer==3.3.2
 openai==1.13.3
 azure-identity==1.15.0
 python-dotenv
+azure-storage-blob==12.23.1

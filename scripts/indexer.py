@@ -10,6 +10,8 @@ import argparse
 import glob
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from dotenv import load_dotenv
+from azure.storage.blob import BlobServiceClient
+from azure.core.exceptions import ResourceExistsError
 
 load_dotenv()
 
@@ -25,6 +27,7 @@ aoai_endpoint = os.environ["AOAI_ENDPOINT"]
 aoai_api_version = os.environ["AOAI_API_VERSION"]
 aoai_embeddings_deployment_name = os.environ["AOAI_EMBEDDINGS_DEPLOYMENT_NAME"]
 document_intelligence_endpoint = os.environ["DOCUMENT_INTELLIGENCE_ENDPOINT"]
+blob_storage_account_name = os.environ["BLOB_STORAGE_ACCOUNT_NAME"]
 
 # Pythonの実行時にコマンドライン引数を受け取るための設定を行う
 parser = argparse.ArgumentParser()
@@ -101,6 +104,22 @@ def delete_index():
     client = SearchIndexClient(search_service_endpoint, azure_credential)
     client.delete_index('docs')
 
+def upload_docs(chunks: list):
+    """
+    ドキュメントをStorageAccountのBlobへアップロードする
+    """
+    container_name = "chunked-text-container"
+    blob_service_client = BlobServiceClient(account_url=f"https://{blob_storage_account_name}.blob.core.windows.net", credential=azure_credential)
+    try:
+        container_client = blob_service_client.create_container(name=container_name)
+    except ResourceExistsError:
+        container_client = blob_service_client.get_container_client(container=container_name)
+
+    for i, chunk in enumerate(chunks):
+        print(f"{i+1}個目のチャンクを処理中...")
+        container_client.upload_blob(name = f"{i}.txt", data = chunk, overwrite = True)
+
+
 def index_docs(chunks: list):
     """
     ドキュメントをAzure AI Searchにインデックスする
@@ -172,6 +191,8 @@ if __name__ == "__main__":
             overlap = int(args.overlap)
             result = create_chunk(content, separator, chunksize, overlap)
 
+            # テキストをStorageAccountへアップロードする
+            upload_docs(result)
             # テキストをAzure AI Searchにインデックスする
             index_docs(result)
 
