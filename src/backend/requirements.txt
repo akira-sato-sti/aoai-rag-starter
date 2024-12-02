@@ -4,7 +4,7 @@
 
 azure-functions
 azure-search-documents==11.6.0b2
-openai==1.13.3
+openai==1.55.3
 azure-identity==1.15.0
 tiktoken==0.8.0
 azure-cosmos==4.6.0
